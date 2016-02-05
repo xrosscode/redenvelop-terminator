@@ -11,12 +11,15 @@
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Holo.Light">
 
-        <activity android:name="com.xrosscode.plugin.wechat.redenvelop.MainActivity">
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_of_settings_activity"/>
         <service
             android:name=".RedEnvelopTerminatorService"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">

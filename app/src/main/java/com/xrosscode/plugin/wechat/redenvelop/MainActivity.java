@@ -1,7 +1,10 @@
 package com.xrosscode.plugin.wechat.redenvelop;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -39,5 +42,21 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 RedEnvelopTerminatorService.enableIfNecessary(this);
                 break;
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        getMenuInflater().inflate(R.menu.main_activity_options, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(final MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.main_activity_options_menu_item_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

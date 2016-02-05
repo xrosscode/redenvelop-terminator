@@ -1,9 +1,12 @@
 <resources>
     <string name="app_name">微信红包终结者</string>
     <string name="accessibility_service_description">微信红包终结者服务</string>
+    <string name="title_of_main_activity">微信红包终结者</string>
     <string name="label_of_main_activity_red_envelop_terminator_service_already_started">微信红包终结者服务已开启</string>
     <string name="label_of_main_activity_tap_to_start_red_envelop_terminator_service">点击开启微信红包终结者服务</string>
+    <string name="title_of_settings_activity">设置</string>
     <string name="toast_red_envelop_terminator_service_connected">微信红包终结者服务已连接</string>
     <string name="toast_red_envelop_terminator_service_interrupted">微信红包终结者服务已中断</string>
     <string name="toast_open_notification_failed">打开消息通知失败</string>
+    <string name="title_of_main_activity_options_menu_item_settings">设置</string>
 </resources>
