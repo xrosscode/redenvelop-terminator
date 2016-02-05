@@ -52,6 +52,8 @@ public class RedEnvelopTerminatorService extends AccessibilityService {
 
     private final Handler mHandler = new Handler();
 
+    private boolean mFirstOpen = false;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -79,7 +81,7 @@ public class RedEnvelopTerminatorService extends AccessibilityService {
 
                 // 凡是带有 [微信红包] 字样的消息，通通打开
                 if (text.toString().contains("[微信红包]")) {
-                    openRedEnvelopNotification(event);
+                    openRedEnvelopFromNotification(event);
                 }
                 break;
             }
@@ -106,12 +108,13 @@ public class RedEnvelopTerminatorService extends AccessibilityService {
      *
      * @param event
      */
-    private void openRedEnvelopNotification(final AccessibilityEvent event) {
+    private void openRedEnvelopFromNotification(final AccessibilityEvent event) {
         final Parcelable data = event.getParcelableData();
         if (!(data instanceof Notification)) {
             return;
         }
 
+        this.mFirstOpen = true;
         final Notification notification = (Notification) data;
 
         try {
@@ -140,6 +143,19 @@ public class RedEnvelopTerminatorService extends AccessibilityService {
                 final AccessibilityNodeInfo node = nodes.get(i);
                 node.performAction(AccessibilityNodeInfo.ACTION_CLICK);
             }
+
+            this.mFirstOpen = false;
+
+            // 抢完红包后退到 HOME，这样才会有消息通知
+            this.mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    final Intent intent = new Intent(Intent.ACTION_MAIN);
+                    intent.addCategory(Intent.CATEGORY_HOME);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                }
+            }, 5000L);
         } else if ("com.tencent.mm.plugin.luckymoney.ui.LuckyMoneyDetailUI".equals(clazz)) { // 红包详情界面
             // TODO
         } else if ("com.tencent.mm.ui.LauncherUI".equals(clazz)) { // 聊天界面
@@ -186,8 +202,11 @@ public class RedEnvelopTerminatorService extends AccessibilityService {
             return;
         }
 
-        for (int i = redEnvelops.size() - 1; i >= 0; i--) {
-            redEnvelops.get(i).getParent().performAction(AccessibilityNodeInfo.ACTION_CLICK);
+        // 点开最近收到的红包
+        final AccessibilityNodeInfo parent = redEnvelops.get(redEnvelops.size() - 1).getParent();
+        if (this.mFirstOpen) {
+            parent.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+            this.mFirstOpen = true;
         }
     }
 
