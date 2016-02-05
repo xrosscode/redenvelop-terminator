@@ -25,7 +25,12 @@ public class Preferences {
     }
 
     public long getAutoGoHomeDelayTime() {
-        return this.mSharedPreferences.getLong(PREFERENCES_AUTO_GO_HOME_DELAY_TIME, 5L);
+        String s = mSharedPreferences.getString(PREFERENCES_AUTO_GO_HOME_DELAY_TIME, "5");
+        try {
+            return Long.parseLong(s);
+        } catch (NumberFormatException e) {
+            return 5L;
+        }
     }
 
 }
