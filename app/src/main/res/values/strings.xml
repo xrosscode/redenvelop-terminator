@@ -9,4 +9,9 @@
     <string name="toast_red_envelop_terminator_service_interrupted">微信红包终结者服务已中断</string>
     <string name="toast_open_notification_failed">打开消息通知失败</string>
     <string name="title_of_main_activity_options_menu_item_settings">设置</string>
+    <string name="title_of_preference_category_auto_go_home">抢完红包后</string>
+    <string name="label_of_preference_auto_go_home">回主屏</string>
+    <string name="summary_of_preference_auto_go_home">拆红包后，自动回到主屏</string>
+    <string name="label_of_preference_auto_go_home_delay_time">延时</string>
+    <string name="summary_of_preference_auto_go_home_delay_time">回主屏延时（单位：秒）</string>
 </resources>

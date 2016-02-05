@@ -53,6 +53,8 @@ public class RedEnvelopTerminatorService extends AccessibilityService {
 
     private final Handler mHandler = new Handler();
 
+    private Preferences mPreferences;
+
     private PowerManager.WakeLock mWakeLock;
 
     private boolean mFirstOpen = false;
@@ -73,6 +75,7 @@ public class RedEnvelopTerminatorService extends AccessibilityService {
         final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         this.mWakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK, getClass().getName());
         this.mWakeLock.acquire();
+        this.mPreferences = new Preferences(this);
     }
 
     @Override
@@ -163,15 +166,17 @@ public class RedEnvelopTerminatorService extends AccessibilityService {
             this.mFirstOpen = false;
 
             // 抢完红包后退到 HOME，这样才会有消息通知
-            this.mHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    final Intent intent = new Intent(Intent.ACTION_MAIN);
-                    intent.addCategory(Intent.CATEGORY_HOME);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                }
-            }, 5000L);
+            if (this.mPreferences.autoGoHome()) {
+                this.mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        final Intent intent = new Intent(Intent.ACTION_MAIN);
+                        intent.addCategory(Intent.CATEGORY_HOME);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    }
+                }, this.mPreferences.getAutoGoHomeDelayTime() * 1000L);
+            }
         } else if ("com.tencent.mm.plugin.luckymoney.ui.LuckyMoneyDetailUI".equals(clazz)) { // 红包详情界面
             // TODO
         } else if ("com.tencent.mm.ui.LauncherUI".equals(clazz)) { // 聊天界面
