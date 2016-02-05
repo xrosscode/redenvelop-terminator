@@ -90,6 +90,17 @@ public class RedEnvelopTerminatorService extends AccessibilityService {
         }
     }
 
+    @Override
+    public void onInterrupt() {
+        Toast.makeText(this, R.string.toast_red_envelop_terminator_service_interrupted, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onServiceConnected() {
+        super.onServiceConnected();
+        Toast.makeText(this, R.string.toast_red_envelop_terminator_service_connected, Toast.LENGTH_SHORT).show();
+    }
+
     /**
      * 打开内容中带有 <b>[微信红包]</b> 字样的消息通知
      *
@@ -114,7 +125,8 @@ public class RedEnvelopTerminatorService extends AccessibilityService {
      * 抢红包
      *
      * 0. 从通知栏打开微信红包的消息，跳转到聊天界面
-     * 1. 从聊天历史中找到红包
+     * 1. 从聊天历史中找到红包并点开
+     * 3. 在拆红包界面找到“抢”按钮，拆红包
      *
      * @param event
      */
@@ -135,6 +147,13 @@ public class RedEnvelopTerminatorService extends AccessibilityService {
         }
     }
 
+    /**
+     * 根据 UI 组件的类名查找
+     *
+     * @param root
+     * @param clazzName
+     * @return
+     */
     private List<AccessibilityNodeInfo> findAccessibilityNodeInfoByClassName(final AccessibilityNodeInfo root, final String clazzName) {
         final List<AccessibilityNodeInfo> nodes = new ArrayList<AccessibilityNodeInfo>();
         final Stack<AccessibilityNodeInfo> stack = new Stack<AccessibilityNodeInfo>();
@@ -170,17 +189,6 @@ public class RedEnvelopTerminatorService extends AccessibilityService {
         for (int i = redEnvelops.size() - 1; i >= 0; i--) {
             redEnvelops.get(i).getParent().performAction(AccessibilityNodeInfo.ACTION_CLICK);
         }
-    }
-
-    @Override
-    public void onInterrupt() {
-        Toast.makeText(this, R.string.toast_red_envelop_terminator_service_interrupted, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    protected void onServiceConnected() {
-        super.onServiceConnected();
-        Toast.makeText(this, R.string.toast_red_envelop_terminator_service_connected, Toast.LENGTH_SHORT).show();
     }
 
 }
