@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Parcelable;
+import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
@@ -52,6 +53,8 @@ public class RedEnvelopTerminatorService extends AccessibilityService {
 
     private final Handler mHandler = new Handler();
 
+    private PowerManager.WakeLock mWakeLock;
+
     private boolean mFirstOpen = false;
 
     @Override
@@ -66,6 +69,19 @@ public class RedEnvelopTerminatorService extends AccessibilityService {
                 .setAutoCancel(false)
                 .build();
         startForeground(R.string.accessibility_service_description, notification);
+
+        final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        this.mWakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK, getClass().getName());
+        this.mWakeLock.acquire();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (null != this.mWakeLock && this.mWakeLock.isHeld()) {
+            this.mWakeLock.release();
+            this.mWakeLock = null;
+       }
     }
 
     @Override
