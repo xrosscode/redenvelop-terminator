@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.xrosscode.plugin.wechat.redenvelop.MainActivity">
+
+    <TextView
+        android:id="@+id/main_activity_status"
+        android:layout_centerInParent="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="12dp"
+        android:text="@string/label_of_main_activity_tap_to_start_red_envelop_terminator_service"
+        android:textAppearance="?android:textAppearanceMedium" />
+
+</RelativeLayout>
