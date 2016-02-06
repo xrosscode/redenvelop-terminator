@@ -2,8 +2,8 @@
 <accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
     android:description="@string/accessibility_service_description"
     android:packageNames="com.tencent.mm"
-    android:accessibilityEventTypes="typeAllMask"
+    android:accessibilityEventTypes="typeViewClicked|typeNotificationStateChanged|typeWindowStateChanged"
     android:accessibilityFlags="flagDefault"
-    android:accessibilityFeedbackType="feedbackSpoken"
-    android:notificationTimeout="10"
+    android:accessibilityFeedbackType="feedbackAllMask"
+    android:notificationTimeout="1"
     android:canRetrieveWindowContent="true" />
