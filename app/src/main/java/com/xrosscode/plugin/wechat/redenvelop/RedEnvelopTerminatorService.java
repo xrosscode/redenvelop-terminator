@@ -59,27 +59,24 @@ public class RedEnvelopTerminatorService extends AccessibilityService {
 
     private boolean mFirstOpen = false;
 
+    private boolean mKeyguardDisabled = false;
+
     @Override
     public void onCreate() {
         super.onCreate();
         this.mPreferences = new Preferences(this);
+        this.initWakeLock();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (null != this.mWakeLock && this.mWakeLock.isHeld()) {
-            this.mWakeLock.release();
-            this.mWakeLock = null;
-       }
+        this.releaseWakeLock();
     }
 
     @Override
     public void onAccessibilityEvent(final AccessibilityEvent event) {
         switch (event.getEventType()) {
-            case AccessibilityEvent.TYPE_VIEW_CLICKED:
-                Log.v(TAG, "Clicked by user");
-                break;
             case AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED: {
                 final List<CharSequence> text = event.getText();
                 if (null == text || text.isEmpty()) {
@@ -100,11 +97,6 @@ public class RedEnvelopTerminatorService extends AccessibilityService {
     }
 
     @Override
-    public void onInterrupt() {
-        Toast.makeText(this, R.string.toast_red_envelop_terminator_service_interrupted, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
     protected void onServiceConnected() {
         super.onServiceConnected();
 
@@ -112,16 +104,45 @@ public class RedEnvelopTerminatorService extends AccessibilityService {
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setTicker(getString(R.string.label_of_main_activity_red_envelop_terminator_service_already_started))
                 .setContentTitle(getString(R.string.app_name))
-                .setContentText(getString(R.string.accessibility_service_description))
+                .setContentText(getString(R.string.toast_red_envelop_terminator_service_connected))
+                .setContentIntent(PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0))
                 .setAutoCancel(false)
                 .build();
         startForeground(R.string.accessibility_service_description, notification);
 
-        final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        Toast.makeText(this, R.string.toast_red_envelop_terminator_service_connected, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onInterrupt() {
+        final Notification notification = new NotificationCompat.Builder(this)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setTicker(getString(R.string.label_of_main_activity_red_envelop_terminator_service_already_started))
+                .setContentTitle(getString(R.string.app_name))
+                .setContentText(getString(R.string.toast_red_envelop_terminator_service_interrupted))
+                .setContentIntent(PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0))
+                .setAutoCancel(false)
+                .build();
+        startForeground(R.string.accessibility_service_description, notification);
+
+        releaseWakeLock();
+
+        Toast.makeText(this, R.string.toast_red_envelop_terminator_service_interrupted, Toast.LENGTH_SHORT).show();
+    }
+
+    private void initWakeLock() {
+        final PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
         this.mWakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK, getClass().getName());
         this.mWakeLock.acquire();
+    }
 
-        Toast.makeText(this, R.string.toast_red_envelop_terminator_service_connected, Toast.LENGTH_SHORT).show();
+    private void releaseWakeLock() {
+        if (null != this.mWakeLock) {
+            if (this.mWakeLock.isHeld()) {
+                this.mWakeLock.release();
+            }
+            this.mWakeLock = null;
+        }
     }
 
     /**
@@ -131,6 +152,8 @@ public class RedEnvelopTerminatorService extends AccessibilityService {
      */
     private void openRedEnvelopFromNotification(final AccessibilityEvent event) {
         Log.v(TAG, "Opening red envelop from notification...");
+
+        disableKeyGuardIfNecessary();
 
         final Parcelable data = event.getParcelableData();
         if (!(data instanceof Notification)) {
@@ -146,6 +169,12 @@ public class RedEnvelopTerminatorService extends AccessibilityService {
         } catch (final PendingIntent.CanceledException e) {
             Toast.makeText(this, R.string.toast_open_notification_failed, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    /**
+     * Disable keyguard before open red envelop
+     */
+    private void disableKeyGuardIfNecessary() {
     }
 
     /**
@@ -220,6 +249,15 @@ public class RedEnvelopTerminatorService extends AccessibilityService {
         final List<AccessibilityNodeInfo> nodes = findAccessibilityNodeInfoByClassName(root, "android.widget.Button");
         if (null == nodes || nodes.isEmpty()) {
             Log.e(TAG, "The red envelop has been snapped up");
+
+            if (this.mPreferences.autoGoHome()) {
+                this.mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        performGlobalAction(GLOBAL_ACTION_HOME);
+                    }
+                }, this.mPreferences.getAutoGoHomeDelayTime() * 1000L);
+            }
             return;
         }
 

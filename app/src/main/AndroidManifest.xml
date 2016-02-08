@@ -2,6 +2,7 @@
     package="com.xrosscode.plugin.wechat.redenvelop">
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
 
     <application
         android:allowBackup="true"
@@ -11,7 +12,9 @@
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Holo.Light">
 
-        <activity android:name=".MainActivity">
+        <activity
+            android:name=".MainActivity"
+            android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER" />
