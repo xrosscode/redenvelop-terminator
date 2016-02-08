@@ -123,8 +123,6 @@ public class RedEnvelopTerminatorService extends AccessibilityService {
                 .build();
         startForeground(R.string.accessibility_service_description, notification);
 
-        releaseWakeLock();
-
         Toast.makeText(this, R.string.toast_red_envelop_terminator_service_interrupted, Toast.LENGTH_SHORT).show();
     }
 
