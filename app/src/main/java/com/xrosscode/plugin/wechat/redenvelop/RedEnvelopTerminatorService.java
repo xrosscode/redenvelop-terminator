@@ -59,8 +59,6 @@ public class RedEnvelopTerminatorService extends AccessibilityService {
 
     private boolean mFirstOpen = false;
 
-    private boolean mKeyguardDisabled = false;
-
     @Override
     public void onCreate() {
         super.onCreate();
