@@ -198,14 +198,8 @@ public class RedEnvelopTerminatorService extends AccessibilityService {
 
         // 红包详情界面
         if ("com.tencent.mm.plugin.luckymoney.ui.LuckyMoneyDetailUI".equals(clazz)) {
-            if (this.mPreferences.autoGoHome()) {
-                this.mHandler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        performGlobalAction(GLOBAL_ACTION_HOME);
-                    }
-                }, this.mPreferences.getAutoGoHomeDelayTime() * 1000L);
-            }
+            this.goHomeIfNecessary();
+            return;
         }
     }
 
@@ -220,6 +214,12 @@ public class RedEnvelopTerminatorService extends AccessibilityService {
         final List<AccessibilityNodeInfo> redEnvelops = root.findAccessibilityNodeInfosByText("领取红包");
         if (null == redEnvelops || redEnvelops.isEmpty()) {
             Log.v(TAG, "No red envelop found");
+
+            // 假红包
+            if (this.mFirstOpen) {
+                this.goHomeIfNecessary();
+                this.mFirstOpen = false;
+            }
             return;
         }
 
@@ -230,7 +230,7 @@ public class RedEnvelopTerminatorService extends AccessibilityService {
         if (this.mFirstOpen) {
             Log.v(TAG, "Opening red envelop in conversation");
             parent.performAction(AccessibilityNodeInfo.ACTION_CLICK);
-            this.mFirstOpen = true;
+            this.mFirstOpen = false;
         }
     }
 
@@ -245,15 +245,7 @@ public class RedEnvelopTerminatorService extends AccessibilityService {
         final List<AccessibilityNodeInfo> nodes = findAccessibilityNodeInfoByClassName(root, "android.widget.Button");
         if (null == nodes || nodes.isEmpty()) {
             Log.e(TAG, "The red envelop has been snapped up");
-
-            if (this.mPreferences.autoGoHome()) {
-                this.mHandler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        performGlobalAction(GLOBAL_ACTION_HOME);
-                    }
-                }, this.mPreferences.getAutoGoHomeDelayTime() * 1000L);
-            }
+            this.goHomeIfNecessary();
             return;
         }
 
@@ -288,6 +280,17 @@ public class RedEnvelopTerminatorService extends AccessibilityService {
         }
 
         return nodes;
+    }
+
+    private void goHomeIfNecessary() {
+        if (this.mPreferences.autoGoHome()) {
+            this.mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    performGlobalAction(GLOBAL_ACTION_HOME);
+                }
+            }, this.mPreferences.getAutoGoHomeDelayTime() * 1000L);
+        }
     }
 
 }
