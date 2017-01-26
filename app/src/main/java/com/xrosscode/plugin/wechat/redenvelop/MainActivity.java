@@ -31,7 +31,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
         final int label = available
                 ? R.string.label_of_main_activity_red_envelop_terminator_service_already_started
                 : R.string.label_of_main_activity_tap_to_start_red_envelop_terminator_service;
-        this.mStatusView.setEnabled(!available);
         this.mStatusView.setText(label);
     }
 

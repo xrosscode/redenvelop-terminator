@@ -10,9 +10,7 @@ public class Preferences {
 
     public static final String PREFERENCES_NAME = "preferences";
 
-    public static final String PREFERENCES_AUTO_GO_HOME = "preference.autogohome";
-
-    public static final String PREFERENCES_AUTO_GO_HOME_DELAY_TIME = "preference.autogohome.delaytime";
+    public static final String PREFERENCES_TTS = "preference.tts";
 
     private final SharedPreferences mSharedPreferences;
 
@@ -20,16 +18,8 @@ public class Preferences {
         this.mSharedPreferences = context.getSharedPreferences(PREFERENCES_NAME, 0);
     }
 
-    public boolean autoGoHome() {
-        return this.mSharedPreferences.getBoolean(PREFERENCES_AUTO_GO_HOME, false);
-    }
-
-    public long getAutoGoHomeDelayTime() {
-        try {
-            return Long.parseLong(this.mSharedPreferences.getString(PREFERENCES_AUTO_GO_HOME_DELAY_TIME, "5"));
-        } catch (final NumberFormatException e) {
-            return 5L;
-        }
+    public boolean isTtsEnabled() {
+        return this.mSharedPreferences.getBoolean(PREFERENCES_TTS, false);
     }
 
 }

@@ -7,9 +7,11 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Parcelable;
 import android.os.PowerManager;
+import android.speech.tts.TextToSpeech;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
@@ -24,9 +26,11 @@ import java.util.Stack;
 /**
  * @author johnsonlee
  */
-public class RedEnvelopTerminatorService extends AccessibilityService {
+public class RedEnvelopTerminatorService extends AccessibilityService implements TextToSpeech.OnInitListener {
 
     static final String TAG = RedEnvelopTerminatorService.class.getSimpleName();
+
+    private static final String WEI_XIN_HONG_BAO = "[微信红包]";
 
     public static boolean available(final Context context) {
         final AccessibilityManager am = (AccessibilityManager) context.getSystemService(Context.ACCESSIBILITY_SERVICE);
@@ -57,18 +61,28 @@ public class RedEnvelopTerminatorService extends AccessibilityService {
 
     private PowerManager.WakeLock mWakeLock;
 
+    private TextToSpeech mTts;
+
     private boolean mFirstOpen = false;
+
+    @Override
+    public void onInit(final int status) {
+        Log.v(TAG, "Initialize TTS engine: " + status);
+    }
 
     @Override
     public void onCreate() {
         super.onCreate();
         this.mPreferences = new Preferences(this);
+        this.mTts = new TextToSpeech(this, this);
         this.initWakeLock();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        this.mTts.stop();
+        this.mTts.shutdown();
         this.releaseWakeLock();
     }
 
@@ -81,8 +95,11 @@ public class RedEnvelopTerminatorService extends AccessibilityService {
                     return;
                 }
 
+                Log.v(TAG, event.toString());
+
                 // 凡是带有 [微信红包] 字样的消息，通通打开
-                if (text.toString().contains("[微信红包]")) {
+                if (text.toString().contains(WEI_XIN_HONG_BAO)) {
+                    notifyIfNecessary(event);
                     openRedEnvelopFromNotification(event);
                 }
                 break;
@@ -198,7 +215,7 @@ public class RedEnvelopTerminatorService extends AccessibilityService {
 
         // 红包详情界面
         if ("com.tencent.mm.plugin.luckymoney.ui.LuckyMoneyDetailUI".equals(clazz)) {
-            this.goHomeIfNecessary();
+            this.leftIfNecessary();
             return;
         }
     }
@@ -217,7 +234,7 @@ public class RedEnvelopTerminatorService extends AccessibilityService {
 
             // 假红包
             if (this.mFirstOpen) {
-                this.goHomeIfNecessary();
+                this.leftIfNecessary();
                 this.mFirstOpen = false;
             }
             return;
@@ -245,7 +262,7 @@ public class RedEnvelopTerminatorService extends AccessibilityService {
         final List<AccessibilityNodeInfo> nodes = findAccessibilityNodeInfoByClassName(root, "android.widget.Button");
         if (null == nodes || nodes.isEmpty()) {
             Log.e(TAG, "The red envelop has been snapped up");
-            this.goHomeIfNecessary();
+            this.leftIfNecessary();
             return;
         }
 
@@ -282,14 +299,39 @@ public class RedEnvelopTerminatorService extends AccessibilityService {
         return nodes;
     }
 
-    private void goHomeIfNecessary() {
-        if (this.mPreferences.autoGoHome()) {
-            this.mHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    performGlobalAction(GLOBAL_ACTION_HOME);
-                }
-            }, this.mPreferences.getAutoGoHomeDelayTime() * 1000L);
+    private void leftIfNecessary() {
+        // TODO
+    }
+
+    private void notifyIfNecessary(final AccessibilityEvent event) {
+        if (this.mPreferences.isTtsEnabled() && null != this.mTts) {
+            final List<CharSequence> text = event.getText();
+            if (null == text || text.isEmpty()) {
+                return;
+            }
+
+            final String msg = text.get(0).toString();
+            final int pos = msg.indexOf(WEI_XIN_HONG_BAO);
+            if (-1 == pos) {
+                return;
+            }
+
+            // xxx: [微信红包]
+            final String speech;
+            if (pos > 1 && ' ' == msg.charAt(pos - 1) && ':' == msg.charAt(pos - 2)) {
+                final String s = msg.substring(0, pos - 2) + getString(R.string.tts_send_red_envelop);
+                speech = s + s + s;
+            } else {
+                speech = getString(R.string.tts_found_red_envelop);
+            }
+
+            this.mTts.setSpeechRate(3f);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                this.mTts.speak(speech, TextToSpeech.QUEUE_FLUSH, null, String.valueOf(System.currentTimeMillis()));
+            } else {
+                this.mTts.speak(speech, TextToSpeech.QUEUE_FLUSH, null);
+            }
         }
     }
 

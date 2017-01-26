@@ -1,17 +1,17 @@
 <resources>
     <string name="app_name">微信红包终结者</string>
-    <string name="accessibility_service_description">微信红包终结者服务</string>
+    <string name="accessibility_service_description">微信红包终结者</string>
     <string name="title_of_main_activity">微信红包终结者</string>
-    <string name="label_of_main_activity_red_envelop_terminator_service_already_started">微信红包终结者服务已开启</string>
-    <string name="label_of_main_activity_tap_to_start_red_envelop_terminator_service">点击开启微信红包终结者服务</string>
+    <string name="label_of_main_activity_red_envelop_terminator_service_already_started">微信红包终结者已开启</string>
+    <string name="label_of_main_activity_tap_to_start_red_envelop_terminator_service">点击开启微信红包终结者</string>
     <string name="title_of_settings_activity">设置</string>
-    <string name="toast_red_envelop_terminator_service_connected">微信红包终结者服务已连接</string>
-    <string name="toast_red_envelop_terminator_service_interrupted">微信红包终结者服务已中断</string>
+    <string name="toast_red_envelop_terminator_service_connected">微信红包终结者已开启</string>
+    <string name="toast_red_envelop_terminator_service_interrupted">微信红包终结者已关闭</string>
     <string name="toast_open_notification_failed">打开消息通知失败</string>
     <string name="title_of_main_activity_options_menu_item_settings">设置</string>
-    <string name="title_of_preference_category_auto_go_home">抢完红包后</string>
-    <string name="label_of_preference_auto_go_home">回主屏</string>
-    <string name="summary_of_preference_auto_go_home">拆红包后，自动回到主屏</string>
-    <string name="label_of_preference_auto_go_home_delay_time">延时</string>
-    <string name="summary_of_preference_auto_go_home_delay_time">回主屏延时（单位：秒）</string>
+    <string name="title_of_preference_category_tts">发现红包</string>
+    <string name="label_of_preference_tts">语音提醒</string>
+    <string name="summary_of_preference_tts">发现红包后，自动播放语音提醒</string>
+    <string name="tts_send_red_envelop">发红包啦！</string>
+    <string name="tts_found_red_envelop">红包来啦！红包来啦！红包来啦！</string>
 </resources>
