@@ -48,10 +48,7 @@ public class RedEnvelopTerminatorService extends AccessibilityService implements
         return false;
     }
 
-    public static void enableIfNecessary(final Activity context) {
-        if (available(context))
-            return;
-
+    public static void openAccessibilitySettings(final Activity context) {
         context.startActivity(new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS));
     }
 
@@ -68,12 +65,14 @@ public class RedEnvelopTerminatorService extends AccessibilityService implements
     @Override
     public void onInit(final int status) {
         Log.v(TAG, "Initialize TTS engine: " + status);
+        Toast.makeText(getApplicationContext(), "初始化TTS引擎" + (TextToSpeech.SUCCESS == status ? "成功" : "失败"), Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
         this.mPreferences = new Preferences(this);
+        Toast.makeText(this, "TTS已" + (this.mPreferences.isTtsEnabled() ? "启用" : "禁用"), Toast.LENGTH_LONG).show();
         this.mTts = new TextToSpeech(this, this);
         this.initWakeLock();
     }
